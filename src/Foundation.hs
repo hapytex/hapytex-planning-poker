@@ -235,7 +235,7 @@ instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner appConnPool
 
 instance YesodAuth App where
-    type AuthId App = UserId
+    type AuthId App = PlanningUserId
 
     -- Where to send a user after successful login
     loginDest :: App -> Route App
@@ -250,12 +250,12 @@ instance YesodAuth App where
     authenticate :: (MonadHandler m, HandlerSite m ~ App)
                  => Creds App -> m (AuthenticationResult App)
     authenticate creds = liftHandler $ runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
+        x <- getBy $ UniquePlanningUser $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Authenticated uid
-            Nothing -> Authenticated <$> insert User
-                { userIdent = credsIdent creds
-                , userPassword = Nothing
+            Nothing -> Authenticated <$> insert PlanningUser
+                { planningUserIdent = credsIdent creds
+                , planningUserPassword = Nothing
                 }
 
     -- You can add other plugins like Google Email, email or OAuth here
